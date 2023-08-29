@@ -49,7 +49,7 @@ app.post("/register/", async (request, response) => {
 //api2
 app.post("/login/", async (request, response) => {
   const { username, password } = request.body;
-  const checkUser = `select * from user where username='{username}';`;
+  const checkUser = `select * from user where username='${username}';`;
   const dbUserExist = await database.get(checkUser);
   if (dbUserExist !== undefined) {
     const checkPassword = await bcrypt.compare(password, dbUserExist.password);
@@ -174,7 +174,7 @@ app.get("/tweets/:tweetId/", authenticationToken, async (request, response) => {
   const getUserId = await database.get(getUserIdQuery);
   //console.log(getUserId);
   //get the ids of whom the use is following
-  const getFollowingIdsQuery = `select following_user_id from follower_user_id=${getUserId.user_id};`;
+  const getFollowingIdsQuery = `select following_user_id from follower where follower_user_id=${getUserId.user_id};`;
   const getFollowingIdsArray = await database.all(getFollowingIdsQuery);
   //console.log(getFollowingIdsArray);
   const getFollowingIds = getFollowingIdsArray.map((eachFollower) => {
@@ -182,7 +182,7 @@ app.get("/tweets/:tweetId/", authenticationToken, async (request, response) => {
   });
   //console.log(getFollowingIds);
   //get the tweets made by the users he is following
-  const getTweetIdsQuery = `select tweet_id from tweet where user_id in (${getFollowingIds})`;
+  const getTweetIdsQuery = `select tweet_id from tweet where user_id in (${getFollowingIds});`;
   const getTweetIdsArray = await database.all(getTweetIdsQuery);
   const followingTweetIds = getTweetIdsArray.map((eachId) => {
     return eachId.tweet_id;
